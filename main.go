@@ -24,8 +24,9 @@ func main() {
 		if len(prs) > 0 {
 			fmt.Printf("PRs:\n")
 			for _, pr := range prs {
-				fmt.Printf("%s: %s\n", pr.GetTitle(), pr.GetURL())
+				fmt.Printf("%s: %s\n", pr.GetTitle(), pr.GetHTMLURL())
 			}
+			fmt.Printf("\n")
 		}
 
 		issues, _, err := client.Issues.ListByRepo(ctx, "y-yagi", repo_name, nil)
@@ -38,11 +39,10 @@ func main() {
 			fmt.Printf("Issues:\n")
 			for _, issue := range issues {
 				if issue.PullRequestLinks == nil {
-					fmt.Printf("%s: %s\n", issue.GetTitle(), issue.GetURL())
+					fmt.Printf("%s: %s\n", issue.GetTitle(), issue.GetHTMLURL())
 				}
 			}
+			fmt.Printf("\n")
 		}
-
-		fmt.Printf("\n")
 	}
 }
