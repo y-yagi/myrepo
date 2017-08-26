@@ -28,6 +28,21 @@ func main() {
 			}
 		}
 
+		issues, _, err := client.Issues.ListByRepo(ctx, "y-yagi", repo_name, nil)
+		if err != nil {
+			fmt.Printf("err: %v\n", err)
+			continue
+		}
+
+		if len(issues) > 0 {
+			fmt.Printf("Issues:\n")
+			for _, issue := range issues {
+				if issue.PullRequestLinks == nil {
+					fmt.Printf("%s: %s\n", issue.GetTitle(), issue.GetURL())
+				}
+			}
+		}
+
 		fmt.Printf("\n")
 	}
 }
