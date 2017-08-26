@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"golang.org/x/oauth2"
+
 	"github.com/BurntSushi/toml"
 	"github.com/google/go-github/github"
 )
@@ -14,6 +16,7 @@ import (
 type config struct {
 	User         string   `toml:"user"`
 	Repositories []string `toml:"repositories"`
+	AccessToken  string   `toml:"access_token"`
 }
 
 func msg(err error) int {
@@ -67,6 +70,7 @@ func run() int {
 	const prTitle = "[PR]"
 
 	var title string
+	var client *github.Client
 
 	var cfg config
 	err := cfg.load()
@@ -75,7 +79,16 @@ func run() int {
 	}
 
 	ctx := context.Background()
-	client := github.NewClient(nil)
+
+	if len(cfg.AccessToken) > 0 {
+		ts := oauth2.StaticTokenSource(
+			&oauth2.Token{AccessToken: cfg.AccessToken},
+		)
+		tc := oauth2.NewClient(ctx, ts)
+		client = github.NewClient(tc)
+	} else {
+		client = github.NewClient(nil)
+	}
 
 	for _, repo_name := range cfg.Repositories {
 		fmt.Printf("**** %s ****\n", repo_name)
