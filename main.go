@@ -65,11 +65,34 @@ func (cfg *config) load() error {
 	return nil
 }
 
-func run() int {
-	const issueTitle = "[Issue]"
-	const prTitle = "[PR]"
+func fetchFromGitHub(client *github.Client, ctx context.Context, user string, repo string, ch chan<- string) {
+	var result string
+	result += fmt.Sprintf("**** %s ****\n", repo)
 
-	var title string
+	issues, _, err := client.Issues.ListByRepo(ctx, user, repo, nil)
+	if err != nil {
+		result += fmt.Sprintf("err: %v\n", err)
+		ch <- result
+		return
+	}
+
+	if len(issues) > 0 {
+		for _, issue := range issues {
+			if issue.PullRequestLinks == nil {
+				result += "[Issue] "
+			} else {
+				result += "[PR] "
+			}
+
+			result += fmt.Sprintf("%s: %s\n", issue.GetTitle(), issue.GetHTMLURL())
+		}
+		result += fmt.Sprintf("\n")
+	}
+
+	ch <- result
+}
+
+func run() int {
 	var client *github.Client
 
 	var cfg config
@@ -78,8 +101,9 @@ func run() int {
 		return msg(err)
 	}
 
-	ctx := context.Background()
+	ch := make(chan string)
 
+	ctx := context.Background()
 	if len(cfg.AccessToken) > 0 {
 		ts := oauth2.StaticTokenSource(
 			&oauth2.Token{AccessToken: cfg.AccessToken},
@@ -91,26 +115,11 @@ func run() int {
 	}
 
 	for _, repo_name := range cfg.Repositories {
-		fmt.Printf("**** %s ****\n", repo_name)
+		go fetchFromGitHub(client, ctx, cfg.User, repo_name, ch)
+	}
 
-		issues, _, err := client.Issues.ListByRepo(ctx, cfg.User, repo_name, nil)
-		if err != nil {
-			fmt.Printf("err: %v\n", err)
-			continue
-		}
-
-		if len(issues) > 0 {
-			for _, issue := range issues {
-				if issue.PullRequestLinks == nil {
-					title = issueTitle
-				} else {
-					title = prTitle
-				}
-
-				fmt.Printf("%s %s: %s\n", title, issue.GetTitle(), issue.GetHTMLURL())
-			}
-			fmt.Printf("\n")
-		}
+	for range cfg.Repositories {
+		fmt.Printf(<-ch)
 	}
 
 	return 0
