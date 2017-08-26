@@ -65,7 +65,7 @@ func (cfg *config) load() error {
 	return nil
 }
 
-func fetchFromGitHub(client *github.Client, ctx context.Context, user string, repo string, ch chan<- string) {
+func fetchFromGitHub(ctx context.Context, client *github.Client, user string, repo string, ch chan<- string) {
 	var result string
 	result += fmt.Sprintf("**** %s ****\n", repo)
 
@@ -114,8 +114,8 @@ func run() int {
 		client = github.NewClient(nil)
 	}
 
-	for _, repo_name := range cfg.Repositories {
-		go fetchFromGitHub(client, ctx, cfg.User, repo_name, ch)
+	for _, repoName := range cfg.Repositories {
+		go fetchFromGitHub(ctx, client, cfg.User, repoName, ch)
 	}
 
 	for range cfg.Repositories {
