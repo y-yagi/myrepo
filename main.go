@@ -4,13 +4,11 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path/filepath"
-	"runtime"
 
 	"golang.org/x/oauth2"
 
-	"github.com/BurntSushi/toml"
 	"github.com/google/go-github/github"
+	"github.com/y-yagi/configure"
 )
 
 type config struct {
@@ -25,44 +23,6 @@ func msg(err error) int {
 		return 1
 	}
 	return 0
-}
-
-func configDir() string {
-	var dir string
-
-	if runtime.GOOS == "windows" {
-		dir = os.Getenv("APPDATA")
-		if dir == "" {
-			dir = filepath.Join(os.Getenv("USERPROFILE"), "Application Data", "myrepo")
-		}
-		dir = filepath.Join(dir, "myrepo")
-	} else {
-		dir = filepath.Join(os.Getenv("HOME"), ".config", "myrepo")
-	}
-	return dir
-}
-
-func (cfg *config) load() error {
-	dir := configDir()
-	if err := os.MkdirAll(dir, 0700); err != nil {
-		return fmt.Errorf("cannot create directory: %v", err)
-	}
-	file := filepath.Join(dir, "config.toml")
-
-	_, err := os.Stat(file)
-	if err == nil {
-		_, err := toml.DecodeFile(file, cfg)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-
-	if !os.IsNotExist(err) {
-		return err
-	}
-
-	return nil
 }
 
 func fetchFromGitHub(ctx context.Context, client *github.Client, user string, repo string, ch chan<- string) {
@@ -96,7 +56,7 @@ func run() int {
 	var client *github.Client
 
 	var cfg config
-	err := cfg.load()
+	err := configure.Load("myrepo", &cfg)
 	if err != nil {
 		return msg(err)
 	}
