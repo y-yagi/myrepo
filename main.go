@@ -79,7 +79,7 @@ func run() int {
 	}
 
 	for range cfg.Repositories {
-		fmt.Printf(<-ch)
+		fmt.Fprintf(os.Stdout, <-ch)
 	}
 
 	return 0
