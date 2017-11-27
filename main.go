@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"os"
 
@@ -53,9 +54,27 @@ func fetchFromGitHub(ctx context.Context, client *github.Client, user string, re
 }
 
 func run() int {
+	var editConfig bool
+	var cfg config
 	var client *github.Client
 
-	var cfg config
+	flags := flag.NewFlagSet("myrepo", flag.ExitOnError)
+	flags.BoolVar(&editConfig, "c", false, "Edit config.")
+	flags.Parse(os.Args[1:])
+
+	if editConfig {
+		editor := os.Getenv("EDITOR")
+		if len(editor) == 0 {
+			editor = "vim"
+		}
+
+		if err := configure.Edit("myrepo", editor); err != nil {
+			return msg(err)
+		}
+
+		return 0
+	}
+
 	err := configure.Load("myrepo", &cfg)
 	if err != nil {
 		return msg(err)
