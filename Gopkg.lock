@@ -8,16 +8,16 @@
   version = "v0.3.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
-  revision = "c65a0412e71e8b9b3bfd22925720d23c0f054237"
+  revision = "925541529c1fa6821df4e44ce2723319eb2be768"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
   name = "github.com/google/go-github"
   packages = ["github"]
-  revision = "b1f138353a6287df5156971b3963e9107eca06a1"
+  revision = "e7bb4b8ce29fb7beaf0765acda602bc516a56dd5"
 
 [[projects]]
   branch = "master"
@@ -29,7 +29,7 @@
   branch = "master"
   name = "github.com/y-yagi/configure"
   packages = ["."]
-  revision = "4bee88f0d6cec9839aed600d2bca0d66591001f7"
+  revision = "3be07ab709be3a977639cd3f27052240e1e0c2d6"
 
 [[projects]]
   branch = "master"
@@ -38,7 +38,7 @@
     "context",
     "context/ctxhttp"
   ]
-  revision = "0ed95abb35c445290478a5348a7b38bb154135fd"
+  revision = "d0aafc73d5cdc42264b0af071c261abac580695e"
 
 [[projects]]
   branch = "master"
@@ -47,7 +47,7 @@
     ".",
     "internal"
   ]
-  revision = "b28fcf2b08a19742b43084fb40ab78ac6c3d8067"
+  revision = "2f32c3ac0fa4fb807a0fcefb0b6f2468a0d99bd0"
 
 [[projects]]
   name = "google.golang.org/appengine"
